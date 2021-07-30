@@ -84,8 +84,8 @@ describe("Home page", () => {
       
         // expect(screen.getByRole('listitem')).toExist();
         // expect(screen.getByText(recipeName)).toExist();
-        expect(screen.getByRole('listitem')).toBeInTheDocument();
-        expect(screen.getByText(recipeName)).toBeInTheDocument();
+        expect(screen.getByText(recipeName)).toExist();
+        // expect(screen.getByText(recipeName)).toBeInTheDocument();
       })
       it('should display the recipe instructions of a recipe list item that has been clicked', async()=>{
         const {instructionsInput, nameInput, submitButton, app} = setup();
@@ -96,9 +96,25 @@ describe("Home page", () => {
         await userEvent.type(nameInput, recipeName)
         userEvent.click(submitButton);
 
-        userEvent.click(app.getByRole('listitem'));
-        expect(cy.contains('p', recipeInstructions)).toExist();
+        userEvent.click(screen.getByRole('listitem'));
+        return cy.findByText(recipeInstructions).then(element=>Cypress.dom.isVisible(element)).should('eq',true);
 
+      })
+      it('allows a recipe name or instructions to be altered after clicking EDIT', async()=>{
+        const {instructionsInput, nameInput, submitButton, app} = setup();
+        const recipeName = "Lean Pockets"
+        const recipeInstructions = "place in toaster oven on 350 for 45 minutes"
+      
+
+        await userEvent.type(instructionsInput, recipeInstructions)
+        await userEvent.type(nameInput, recipeName)
+        userEvent.click(submitButton);
+        cy.findByRole('button').findByText('edit').click();
+        cy.findByRole('input').should('have.value', recipeName);
+        return cy.findByRole('input').should('have.value', recipeName).invoke('cheese')
+        .then(value=>
+          cy.findByRole('listitem').findByText(value).should('exist')
+          )
       })
   })
 
