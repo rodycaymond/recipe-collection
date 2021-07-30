@@ -1,6 +1,7 @@
 import './App.css';
 
 import React from 'react';
+import { useState } from 'react';
 
 class App extends React.Component {
   constructor(){
@@ -85,13 +86,51 @@ class App extends React.Component {
 }
 
 function RecipeList(props){
-  let listItems = props.items.listItemName.map((item,index)=>{
-    return <li key={index}>{item}</li>
+  let listItems = [];
+  for (let i=0; i<props.items.listItemName.length; i++){
+    let obj = {};
+    obj.name = props.items.listItemName[i];
+    obj.instructions = props.items.instructions[i];
+    listItems.push(obj);
+  }
+  console.log(listItems)
+  let finalList = listItems.map((item,index)=>{
+    return <Recipe style={{border: '2px solid black', margin: '5px 0px'}} info={item} />
   })
 
   return (
+    <ul >
+      {finalList}
+    </ul>
+  )
+}
+
+function Recipe(props){
+   const [styleSettings, setStyle] = useState({display: 'none'});
+   const [input, setInput] = useState({display: 'none'})
+   const [recipeName, setRecipeName] = useState(props.info.name);
+   const [instName, setInstName] = useState(props.info.instructions);
+
+   function handleEdit(){
+    setInput({display: 'initial'});
+   }
+   function handleSave(){
+     setInput({display: 'none'});
+   }
+   function handleInstructions(){
+     if (styleSettings.display === 'none'){
+       setStyle({display: 'initial'});
+     } else {
+       setStyle({display: 'none'})
+     }
+   }
+  return (
     <ul>
-      {listItems}
+      <button onClick={handleEdit}>Edit</button><button style={input} onClick={handleSave}>Save</button>
+      <li onClick={handleInstructions} >{recipeName}</li>
+      <input onChange={(event)=>setRecipeName(event.target.value)} style={input} value={recipeName} placeholder="new recipe name"></input><br></br>
+      <p style={styleSettings}>{instName}</p><br></br>
+      <input onChange={(event)=>setInstName(event.target.value)} style={input} value={instName} placeholder="new instructions"></input>
     </ul>
   )
 }

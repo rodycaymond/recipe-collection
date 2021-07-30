@@ -1,3 +1,4 @@
+/* eslint-env jest */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { render, screen } from '@testing-library/react';
@@ -76,7 +77,6 @@ describe("Home page", () => {
         const recipeName = "Lean Pockets"
         const recipeInstructions = "place in toaster oven on 350 for 45 minutes"
       
-        userEvent.click(app.getByText('Add Recipe'));
 
         await userEvent.type(instructionsInput, recipeInstructions)
         await userEvent.type(nameInput, recipeName)
@@ -86,6 +86,19 @@ describe("Home page", () => {
         // expect(screen.getByText(recipeName)).toExist();
         expect(screen.getByRole('listitem')).toBeInTheDocument();
         expect(screen.getByText(recipeName)).toBeInTheDocument();
+      })
+      it('should display the recipe instructions of a recipe list item that has been clicked', async()=>{
+        const {instructionsInput, nameInput, submitButton, app} = setup();
+        const recipeName = "Lean Pockets"
+        const recipeInstructions = "place in toaster oven on 350 for 45 minutes"
+
+        await userEvent.type(instructionsInput, recipeInstructions)
+        await userEvent.type(nameInput, recipeName)
+        userEvent.click(submitButton);
+
+        userEvent.click(app.getByRole('listitem'));
+        expect(cy.contains('p', recipeInstructions)).toExist();
+
       })
   })
 
